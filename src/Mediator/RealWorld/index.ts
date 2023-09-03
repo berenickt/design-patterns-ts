@@ -11,7 +11,7 @@
  * Extending the Mediator interface to have a payload to include messages
  */
 interface Mediator {
-    notify(sender: object, event: string, payload?: string): void;
+  notify(sender: object, event: string, payload?: string): void
 }
 
 /**
@@ -19,17 +19,20 @@ interface Mediator {
  * the mediator.
  */
 class User {
-    constructor(public name: string, private mediator: Mediator) {
-        this.mediator.notify(this, 'subscribe');
-    }
+  constructor(
+    public name: string,
+    private mediator: Mediator,
+  ) {
+    this.mediator.notify(this, 'subscribe')
+  }
 
-    receiveMessage(message: string) {
-        console.log(`Message received by ${this.name}: ${message}`);
-    }
+  receiveMessage(message: string) {
+    console.log(`Message received by ${this.name}: ${message}`)
+  }
 
-    publishMessage(message: string) {
-        this.mediator.notify(this, 'publish', message);
-    }
+  publishMessage(message: string) {
+    this.mediator.notify(this, 'publish', message)
+  }
 }
 
 /**
@@ -37,33 +40,33 @@ class User {
  * collaborators can notify: subscribe and publish
  */
 class ChatAppMediator implements Mediator {
-    private users: User[] = [];
+  private users: User[] = []
 
-    public notify(sender: object, event: string, payload?: string): void {
-        if (event === 'subscribe') {
-            const user = sender as User;
-            console.log(`Subscribing ${user.name}`);
-            this.users.push(user);
-        }
-
-        if (event === 'publish') {
-            console.log(`Publishing message "${payload}" to the group`);
-            const usersExcludingSender = this.users.filter(u => u !== sender);
-            for (const user of usersExcludingSender) {
-                user.receiveMessage(payload);
-            }
-        }
+  public notify(sender: object, event: string, payload?: string): void {
+    if (event === 'subscribe') {
+      const user = sender as User
+      console.log(`Subscribing ${user.name}`)
+      this.users.push(user)
     }
+
+    if (event === 'publish') {
+      console.log(`Publishing message "${payload}" to the group`)
+      const usersExcludingSender = this.users.filter(u => u !== sender)
+      for (const user of usersExcludingSender) {
+        user.receiveMessage(payload)
+      }
+    }
+  }
 }
 
 /**
  * The client code. Creating a user automatically subscribes them to the group.
  */
-const chatAppMediator = new ChatAppMediator();
-const user1 = new User('Lightning', chatAppMediator);
-const user2 = new User('Doc', chatAppMediator);
-const user3 = new User('Mater', chatAppMediator);
+const chatAppMediator = new ChatAppMediator()
+const user1 = new User('Lightning', chatAppMediator)
+const user2 = new User('Doc', chatAppMediator)
+const user3 = new User('Mater', chatAppMediator)
 
-user1.publishMessage('Catchaw');
-user2.publishMessage('Ey kid');
-user3.publishMessage('Tomato');
+user1.publishMessage('Catchaw')
+user2.publishMessage('Ey kid')
+user3.publishMessage('Tomato')

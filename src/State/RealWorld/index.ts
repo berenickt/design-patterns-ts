@@ -11,23 +11,22 @@
  * Some auxiliary interfaces
  */
 interface Coin {
-    name: string;
-    value: number;
+  name: string
+  value: number
 }
 
 interface Product {
-    name: string;
-    value: number;
+  name: string
+  value: number
 }
 
 interface InventoryItem {
-    product: Product;
-    items: number;
+  product: Product
+  items: number
 }
 
-interface Inventory
-{
-    items: InventoryItem[];
+interface Inventory {
+  items: InventoryItem[]
 }
 
 /**
@@ -36,75 +35,77 @@ interface Inventory
  * state of the Context.
  */
 class VendingMachineContext {
-    /**
-     * A reference to the current state
-     */
-    private state: State;
-    private credit: number = 0;
-    private inventory: Inventory = INITIAL_INVENTORY;
+  /**
+   * A reference to the current state
+   */
+  private state: State
+  private credit: number = 0
+  private inventory: Inventory = INITIAL_INVENTORY
 
-    constructor(state: State) {
-        this.transitionTo(state);
-    }
+  constructor(state: State) {
+    this.transitionTo(state)
+  }
 
-    /**
-     * Some context public methods that the state will interact with
-     */
-    public addCredit(credit: number) {
-        this.credit += credit;
-        console.log(`Credit is now ${this.credit}`);
-    }
+  /**
+   * Some context public methods that the state will interact with
+   */
+  public addCredit(credit: number) {
+    this.credit += credit
+    console.log(`Credit is now ${this.credit}`)
+  }
 
-    public resetCredit() {
-        this.credit = 0;
-        console.log('Credit has been reset');
-    }
+  public resetCredit() {
+    this.credit = 0
+    console.log('Credit has been reset')
+  }
 
-    public hasStockOf(product: Product): boolean {
-        return this.inventory.items.some(i => i.product.name === product.name && i.items > 0);
-    }
+  public hasStockOf(product: Product): boolean {
+    return this.inventory.items.some(i => i.product.name === product.name && i.items > 0)
+  }
 
-    public isOutOfStock(): boolean {
-        return !this.inventory.items.some(i => i.items > 0);
-    }
+  public isOutOfStock(): boolean {
+    return !this.inventory.items.some(i => i.items > 0)
+  }
 
-    public dispenseProduct(product: Product) {
-        if (product.value > this.credit) {
-            throw new Error(`You are trying to buy a product with price ${product.value} but your credit is only ${this.credit}`);
-        }
-        if (!this.hasStockOf(product)) {
-            throw new Error(`No ${product.name} products left, select another one`);
-        }
-        const inventoryItem = this.inventory.items.find(i => i.product.name === product.name);
-        const newInventoryItem = {
-            product,
-            items: inventoryItem.items - 1,
-        };
-        const restOfInventory = this.inventory.items.filter(i => i.product.name !== product.name);
-        this.inventory.items = [...restOfInventory, newInventoryItem];
-        console.log(`Product ${product.name} dispensed. Inventory is now:`, this.inventory.items);
-        this.resetCredit();
+  public dispenseProduct(product: Product) {
+    if (product.value > this.credit) {
+      throw new Error(
+        `You are trying to buy a product with price ${product.value} but your credit is only ${this.credit}`,
+      )
     }
+    if (!this.hasStockOf(product)) {
+      throw new Error(`No ${product.name} products left, select another one`)
+    }
+    const inventoryItem = this.inventory.items.find(i => i.product.name === product.name)
+    const newInventoryItem = {
+      product,
+      items: inventoryItem.items - 1,
+    }
+    const restOfInventory = this.inventory.items.filter(i => i.product.name !== product.name)
+    this.inventory.items = [...restOfInventory, newInventoryItem]
+    console.log(`Product ${product.name} dispensed. Inventory is now:`, this.inventory.items)
+    this.resetCredit()
+  }
 
-    /**
-     * The Context allows changing the State object at runtime.
-     */
-    public transitionTo(state: State): void {
-        console.log(`Context: Transition to ${(<any>state).constructor.name}.`);
-        this.state = state;
-        this.state.setContext(this);
-    }
+  /**
+   * The Context allows changing the State object at runtime.
+   */
+  public transitionTo(state: State): void {
+    console.log(`Context: Transition to ${(<any>state).constructor.name}.`)
+    this.state = state
+    this.state.setContext(this)
+  }
 
-    /**
-     * The Context delegates part of its behavior to the current State
-     */
-    public insertCoin(coin: Coin): void {
-        this.state.insertCoin(coin);
-    }
+  /**
+   * The Context delegates part of its behavior to the current State
+   */
+  public insertCoin(coin: Coin): void {
+    this.state.insertCoin(coin)
+  }
 
-    public selectProduct(product: Product): void {
-        this.state.selectProduct(product);
-    }
+  public selectProduct(product: Product): void {
+    this.state.selectProduct(product)
+  }
 }
 
 /**
@@ -114,14 +115,14 @@ class VendingMachineContext {
  * Context to another State.
  */
 abstract class State {
-    protected context: VendingMachineContext;
+  protected context: VendingMachineContext
 
-    public setContext(context: VendingMachineContext) {
-        this.context = context;
-    }
+  public setContext(context: VendingMachineContext) {
+    this.context = context
+  }
 
-    public abstract insertCoin(coin: Coin): void;
-    public abstract selectProduct(product: Product): void;
+  public abstract insertCoin(coin: Coin): void
+  public abstract selectProduct(product: Product): void
 }
 
 /**
@@ -130,96 +131,96 @@ abstract class State {
  * 'tell don't ask' principle.
  */
 class InitialReadyState extends State {
-    public insertCoin(coin: Coin): void {
-        this.context.addCredit(coin.value);
-        this.context.transitionTo(new TransactionStarted());
-    }
+  public insertCoin(coin: Coin): void {
+    this.context.addCredit(coin.value)
+    this.context.transitionTo(new TransactionStarted())
+  }
 
-    public selectProduct(_: Product): void {
-        throw new Error('You should insert coins before selecting the product');
-    }
+  public selectProduct(_: Product): void {
+    throw new Error('You should insert coins before selecting the product')
+  }
 }
 
 class TransactionStarted extends State {
-    public insertCoin(coin: Coin): void {
-        this.context.addCredit(coin.value);
-    }
+  public insertCoin(coin: Coin): void {
+    this.context.addCredit(coin.value)
+  }
 
-    public selectProduct(product: Product): void {
-        this.context.dispenseProduct(product);
+  public selectProduct(product: Product): void {
+    this.context.dispenseProduct(product)
 
-        if (this.context.isOutOfStock()) {
-            this.context.transitionTo(new OutOfStock());
-        } else {
-            this.context.transitionTo(new InitialReadyState());
-        }
+    if (this.context.isOutOfStock()) {
+      this.context.transitionTo(new OutOfStock())
+    } else {
+      this.context.transitionTo(new InitialReadyState())
     }
+  }
 }
 
 class OutOfStock extends State {
-    public insertCoin(_: Coin): void {
-        throw new Error('Stop inserting coins, we completely run out of stock');
-    }
-    public selectProduct(_: Product): void {
-        throw new Error('Stop selecting products, we completely run of stock');
-    }
+  public insertCoin(_: Coin): void {
+    throw new Error('Stop inserting coins, we completely run out of stock')
+  }
+  public selectProduct(_: Product): void {
+    throw new Error('Stop selecting products, we completely run of stock')
+  }
 }
 
 /**
  * Constants to reuse throughtout the application
  */
 const SODA: Product = {
-    name: 'Soda',
-    value: 15,
-};
+  name: 'Soda',
+  value: 15,
+}
 const NUTS: Product = {
-    name: 'Nuts',
-    value: 25,
-};
+  name: 'Nuts',
+  value: 25,
+}
 
 const INITIAL_INVENTORY: Inventory = {
-    items: [
-        { product: SODA, items: 2 },
-        { product: NUTS, items: 0 },
-    ],
-};
+  items: [
+    { product: SODA, items: 2 },
+    { product: NUTS, items: 0 },
+  ],
+}
 
-const NICKEL = { name: 'nickel', value: 5 };
-const DIME = { name: 'dime', value: 10 };
+const NICKEL = { name: 'nickel', value: 5 }
+const DIME = { name: 'dime', value: 10 }
 
 /**
  * The client code should handle edge cases and errors, in this case, only to
  * log them to the console output
  */
-const context = new VendingMachineContext(new InitialReadyState());
+const context = new VendingMachineContext(new InitialReadyState())
 
-const handleError = (error) => {
-    console.error(error.message);
-};
+const handleError = error => {
+  console.error(error.message)
+}
 
 try {
-    context.selectProduct(NUTS);
+  context.selectProduct(NUTS)
 } catch (error) {
-    handleError(error);
+  handleError(error)
 }
-context.insertCoin(DIME);
+context.insertCoin(DIME)
 try {
-    context.selectProduct(SODA);
+  context.selectProduct(SODA)
 } catch (error) {
-    handleError(error);
+  handleError(error)
 }
-context.insertCoin(NICKEL);
-context.selectProduct(SODA);
+context.insertCoin(NICKEL)
+context.selectProduct(SODA)
 
-context.insertCoin(DIME);
-context.insertCoin(NICKEL);
+context.insertCoin(DIME)
+context.insertCoin(NICKEL)
 try {
-    context.selectProduct(SODA);
+  context.selectProduct(SODA)
 } catch (error) {
-    handleError(error);
+  handleError(error)
 }
 try {
-    context.insertCoin(NICKEL);
+  context.insertCoin(NICKEL)
 } catch (error) {
-    handleError(error);
+  handleError(error)
 }

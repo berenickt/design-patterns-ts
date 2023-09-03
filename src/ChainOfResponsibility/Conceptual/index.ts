@@ -11,33 +11,32 @@
  * It also declares a method for executing a request.
  */
 interface Handler {
-    setNext(handler: Handler): Handler;
+  setNext(handler: Handler): Handler
 
-    handle(request: string): string;
+  handle(request: string): string
 }
 
 /**
  * The default chaining behavior can be implemented inside a base handler class.
  */
-abstract class AbstractHandler implements Handler
-{
-    private nextHandler: Handler;
+abstract class AbstractHandler implements Handler {
+  private nextHandler: Handler
 
-    public setNext(handler: Handler): Handler {
-        this.nextHandler = handler;
-        // Returning a handler from here will let us link handlers in a
-        // convenient way like this:
-        // monkey.setNext(squirrel).setNext(dog);
-        return handler;
+  public setNext(handler: Handler): Handler {
+    this.nextHandler = handler
+    // Returning a handler from here will let us link handlers in a
+    // convenient way like this:
+    // monkey.setNext(squirrel).setNext(dog);
+    return handler
+  }
+
+  public handle(request: string): string {
+    if (this.nextHandler) {
+      return this.nextHandler.handle(request)
     }
 
-    public handle(request: string): string {
-        if (this.nextHandler) {
-            return this.nextHandler.handle(request);
-        }
-
-        return null;
-    }
+    return null
+  }
 }
 
 /**
@@ -45,31 +44,30 @@ abstract class AbstractHandler implements Handler
  * in the chain.
  */
 class MonkeyHandler extends AbstractHandler {
-    public handle(request: string): string {
-        if (request === 'Banana') {
-            return `Monkey: I'll eat the ${request}.`;
-        }
-        return super.handle(request);
-
+  public handle(request: string): string {
+    if (request === 'Banana') {
+      return `Monkey: I'll eat the ${request}.`
     }
+    return super.handle(request)
+  }
 }
 
 class SquirrelHandler extends AbstractHandler {
-    public handle(request: string): string {
-        if (request === 'Nut') {
-            return `Squirrel: I'll eat the ${request}.`;
-        }
-        return super.handle(request);
+  public handle(request: string): string {
+    if (request === 'Nut') {
+      return `Squirrel: I'll eat the ${request}.`
     }
+    return super.handle(request)
+  }
 }
 
 class DogHandler extends AbstractHandler {
-    public handle(request: string): string {
-        if (request === 'MeatBall') {
-            return `Dog: I'll eat the ${request}.`;
-        }
-        return super.handle(request);
+  public handle(request: string): string {
+    if (request === 'MeatBall') {
+      return `Dog: I'll eat the ${request}.`
     }
+    return super.handle(request)
+  }
 }
 
 /**
@@ -77,36 +75,36 @@ class DogHandler extends AbstractHandler {
  * cases, it is not even aware that the handler is part of a chain.
  */
 function clientCode(handler: Handler) {
-    const foods = ['Nut', 'Banana', 'Cup of coffee'];
+  const foods = ['Nut', 'Banana', 'Cup of coffee']
 
-    for (const food of foods) {
-        console.log(`Client: Who wants a ${food}?`);
+  for (const food of foods) {
+    console.log(`Client: Who wants a ${food}?`)
 
-        const result = handler.handle(food);
-        if (result) {
-            console.log(`  ${result}`);
-        } else {
-            console.log(`  ${food} was left untouched.`);
-        }
+    const result = handler.handle(food)
+    if (result) {
+      console.log(`  ${result}`)
+    } else {
+      console.log(`  ${food} was left untouched.`)
     }
+  }
 }
 
 /**
  * The other part of the client code constructs the actual chain.
  */
-const monkey = new MonkeyHandler();
-const squirrel = new SquirrelHandler();
-const dog = new DogHandler();
+const monkey = new MonkeyHandler()
+const squirrel = new SquirrelHandler()
+const dog = new DogHandler()
 
-monkey.setNext(squirrel).setNext(dog);
+monkey.setNext(squirrel).setNext(dog)
 
 /**
  * The client should be able to send a request to any handler, not just the
  * first one in the chain.
  */
-console.log('Chain: Monkey > Squirrel > Dog\n');
-clientCode(monkey);
-console.log('');
+console.log('Chain: Monkey > Squirrel > Dog\n')
+clientCode(monkey)
+console.log('')
 
-console.log('Subchain: Squirrel > Dog\n');
-clientCode(squirrel);
+console.log('Subchain: Squirrel > Dog\n')
+clientCode(squirrel)

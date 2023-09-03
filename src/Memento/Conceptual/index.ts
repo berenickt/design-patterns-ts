@@ -11,51 +11,50 @@
  * restoring the state from it.
  */
 class Originator {
-    /**
-     * For the sake of simplicity, the originator's state is stored inside a
-     * single variable.
-     */
-    private state: string;
+  /**
+   * For the sake of simplicity, the originator's state is stored inside a
+   * single variable.
+   */
+  private state: string
 
-    constructor(state: string) {
-        this.state = state;
-        console.log(`Originator: My initial state is: ${state}`);
-    }
+  constructor(state: string) {
+    this.state = state
+    console.log(`Originator: My initial state is: ${state}`)
+  }
 
-    /**
-     * The Originator's business logic may affect its internal state. Therefore,
-     * the client should backup the state before launching methods of the
-     * business logic via the save() method.
-     */
-    public doSomething(): void {
-        console.log('Originator: I\'m doing something important.');
-        this.state = this.generateRandomString(30);
-        console.log(`Originator: and my state has changed to: ${this.state}`);
-    }
+  /**
+   * The Originator's business logic may affect its internal state. Therefore,
+   * the client should backup the state before launching methods of the
+   * business logic via the save() method.
+   */
+  public doSomething(): void {
+    console.log("Originator: I'm doing something important.")
+    this.state = this.generateRandomString(30)
+    console.log(`Originator: and my state has changed to: ${this.state}`)
+  }
 
-    private generateRandomString(length: number = 10): string {
-        const charSet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  private generateRandomString(length: number = 10): string {
+    const charSet = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-        return Array
-            .apply(null, { length })
-            .map(() => charSet.charAt(Math.floor(Math.random() * charSet.length)))
-            .join('');
-    }
+    return Array.apply(null, { length })
+      .map(() => charSet.charAt(Math.floor(Math.random() * charSet.length)))
+      .join('')
+  }
 
-    /**
-     * Saves the current state inside a memento.
-     */
-    public save(): Memento {
-        return new ConcreteMemento(this.state);
-    }
+  /**
+   * Saves the current state inside a memento.
+   */
+  public save(): Memento {
+    return new ConcreteMemento(this.state)
+  }
 
-    /**
-     * Restores the Originator's state from a memento object.
-     */
-    public restore(memento: Memento): void {
-        this.state = memento.getState();
-        console.log(`Originator: My state has changed to: ${this.state}`);
-    }
+  /**
+   * Restores the Originator's state from a memento object.
+   */
+  public restore(memento: Memento): void {
+    this.state = memento.getState()
+    console.log(`Originator: My state has changed to: ${this.state}`)
+  }
 }
 
 /**
@@ -63,11 +62,11 @@ class Originator {
  * as creation date or name. However, it doesn't expose the Originator's state.
  */
 interface Memento {
-    getState(): string;
+  getState(): string
 
-    getName(): string;
+  getName(): string
 
-    getDate(): string;
+  getDate(): string
 }
 
 /**
@@ -75,32 +74,32 @@ interface Memento {
  * state.
  */
 class ConcreteMemento implements Memento {
-    private state: string;
+  private state: string
 
-    private date: string;
+  private date: string
 
-    constructor(state: string) {
-        this.state = state;
-        this.date = new Date().toISOString().slice(0, 19).replace('T', ' ');
-    }
+  constructor(state: string) {
+    this.state = state
+    this.date = new Date().toISOString().slice(0, 19).replace('T', ' ')
+  }
 
-    /**
-     * The Originator uses this method when restoring its state.
-     */
-    public getState(): string {
-        return this.state;
-    }
+  /**
+   * The Originator uses this method when restoring its state.
+   */
+  public getState(): string {
+    return this.state
+  }
 
-    /**
-     * The rest of the methods are used by the Caretaker to display metadata.
-     */
-    public getName(): string {
-        return `${this.date} / (${this.state.substr(0, 9)}...)`;
-    }
+  /**
+   * The rest of the methods are used by the Caretaker to display metadata.
+   */
+  public getName(): string {
+    return `${this.date} / (${this.state.substr(0, 9)}...)`
+  }
 
-    public getDate(): string {
-        return this.date;
-    }
+  public getDate(): string {
+    return this.date
+  }
 }
 
 /**
@@ -109,57 +108,57 @@ class ConcreteMemento implements Memento {
  * works with all mementos via the base Memento interface.
  */
 class Caretaker {
-    private mementos: Memento[] = [];
+  private mementos: Memento[] = []
 
-    private originator: Originator;
+  private originator: Originator
 
-    constructor(originator: Originator) {
-        this.originator = originator;
+  constructor(originator: Originator) {
+    this.originator = originator
+  }
+
+  public backup(): void {
+    console.log("\nCaretaker: Saving Originator's state...")
+    this.mementos.push(this.originator.save())
+  }
+
+  public undo(): void {
+    if (!this.mementos.length) {
+      return
     }
+    const memento = this.mementos.pop()
 
-    public backup(): void {
-        console.log('\nCaretaker: Saving Originator\'s state...');
-        this.mementos.push(this.originator.save());
+    console.log(`Caretaker: Restoring state to: ${memento.getName()}`)
+    this.originator.restore(memento)
+  }
+
+  public showHistory(): void {
+    console.log("Caretaker: Here's the list of mementos:")
+    for (const memento of this.mementos) {
+      console.log(memento.getName())
     }
-
-    public undo(): void {
-        if (!this.mementos.length) {
-            return;
-        }
-        const memento = this.mementos.pop();
-
-        console.log(`Caretaker: Restoring state to: ${memento.getName()}`);
-        this.originator.restore(memento);
-    }
-
-    public showHistory(): void {
-        console.log('Caretaker: Here\'s the list of mementos:');
-        for (const memento of this.mementos) {
-            console.log(memento.getName());
-        }
-    }
+  }
 }
 
 /**
  * Client code.
  */
-const originator = new Originator('Super-duper-super-puper-super.');
-const caretaker = new Caretaker(originator);
+const originator = new Originator('Super-duper-super-puper-super.')
+const caretaker = new Caretaker(originator)
 
-caretaker.backup();
-originator.doSomething();
+caretaker.backup()
+originator.doSomething()
 
-caretaker.backup();
-originator.doSomething();
+caretaker.backup()
+originator.doSomething()
 
-caretaker.backup();
-originator.doSomething();
+caretaker.backup()
+originator.doSomething()
 
-console.log('');
-caretaker.showHistory();
+console.log('')
+caretaker.showHistory()
 
-console.log('\nClient: Now, let\'s rollback!\n');
-caretaker.undo();
+console.log("\nClient: Now, let's rollback!\n")
+caretaker.undo()
 
-console.log('\nClient: Once more!\n');
-caretaker.undo();
+console.log('\nClient: Once more!\n')
+caretaker.undo()

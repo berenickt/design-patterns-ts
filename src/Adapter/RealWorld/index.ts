@@ -13,7 +13,7 @@
  * with
  */
 export interface TaxiCalculator {
-    calculatePriceInEuros(km: number, isAirport: boolean): number;
+  calculatePriceInEuros(km: number, isAirport: boolean): number
 }
 
 /**
@@ -21,17 +21,17 @@ export interface TaxiCalculator {
  * reuse.
  */
 export class UKTaxiCalculatorLibrary {
-    public getPriceInPounds(miles: number, fare: Fares): number {
-        if (fare === Fares.Airport) {
-            return 5 + miles * 2.15;
-        }
-        return miles * 1.95;
+  public getPriceInPounds(miles: number, fare: Fares): number {
+    if (fare === Fares.Airport) {
+      return 5 + miles * 2.15
     }
+    return miles * 1.95
+  }
 }
 
 export enum Fares {
-    Standard,
-    Airport,
+  Standard,
+  Airport,
 }
 
 /**
@@ -39,16 +39,15 @@ export enum Fares {
  * one that the client expects.
  */
 class UKTaxiCalculatorLibraryAdapter implements TaxiCalculator {
-    constructor(private adaptee: UKTaxiCalculatorLibrary) {
-    }
+  constructor(private adaptee: UKTaxiCalculatorLibrary) {}
 
-    calculatePriceInEuros(km: number, isAirport: boolean): number {
-        const miles = km * 1.609;
-        const fare = isAirport ? Fares.Airport : Fares.Standard;
-        const pounds = this.adaptee.getPriceInPounds(miles, fare);
-        const euros = pounds * 1.15;
-        return euros;
-    }
+  calculatePriceInEuros(km: number, isAirport: boolean): number {
+    const miles = km * 1.609
+    const fare = isAirport ? Fares.Airport : Fares.Standard
+    const pounds = this.adaptee.getPriceInPounds(miles, fare)
+    const euros = pounds * 1.15
+    return euros
+  }
 }
 
 /**
@@ -56,11 +55,11 @@ class UKTaxiCalculatorLibraryAdapter implements TaxiCalculator {
  * interface, so we can use the adapter to reuse the incompatible library
  */
 function client(taxiCalculator: TaxiCalculator): void {
-    console.log('Calculating the price for a 15 Km run to the airport');
-    const priceInEuros = taxiCalculator.calculatePriceInEuros(15, true);
-    console.log(`Total price: ${priceInEuros}€`);
+  console.log('Calculating the price for a 15 Km run to the airport')
+  const priceInEuros = taxiCalculator.calculatePriceInEuros(15, true)
+  console.log(`Total price: ${priceInEuros}€`)
 }
 
-const incompatibleLibrary = new UKTaxiCalculatorLibrary();
-const adaptedLibrary = new UKTaxiCalculatorLibraryAdapter(incompatibleLibrary);
-client(adaptedLibrary);
+const incompatibleLibrary = new UKTaxiCalculatorLibrary()
+const adaptedLibrary = new UKTaxiCalculatorLibraryAdapter(incompatibleLibrary)
+client(adaptedLibrary)

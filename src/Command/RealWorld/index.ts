@@ -1,4 +1,4 @@
-const https = require('node:https');
+const https = require('node:https')
 
 /**
  * Real World Example for the Command Design Pattern
@@ -12,20 +12,19 @@ const https = require('node:https');
  * The Command interface declares a method for executing a command.
  */
 interface Command {
-    execute(): void;
+  execute(): void
 }
 
 /**
  * We will use a receiver object to run the business logic
  */
 class PrintRandomFactCommand implements Command {
-    constructor(protected randomFactDomainServiceReceiver: RandomFactDomainServiceReceiver) {
-    }
+  constructor(protected randomFactDomainServiceReceiver: RandomFactDomainServiceReceiver) {}
 
-    public async execute(): Promise<void> {
-        const fact = await this.randomFactDomainServiceReceiver.getRandomFact();
-        console.info(fact);
-    }
+  public async execute(): Promise<void> {
+    const fact = await this.randomFactDomainServiceReceiver.getRandomFact()
+    console.info(fact)
+  }
 }
 
 /**
@@ -33,40 +32,44 @@ class PrintRandomFactCommand implements Command {
  * information
  */
 class RandomFactDomainServiceReceiver {
-    public getRandomFact(): Promise<string> {
-        return new Promise((resolve, reject) => {
-            https.get('https://uselessfacts.jsph.pl/api/v2/facts/random', (res) => {
-                res.on('data', (d) => {
-                    const data = JSON.parse(d);
-                    const fact = data.text;
-                    resolve(fact);
-                });
-            }).on('error', (error) => {
-                reject(error);
-            });
-        });
-    }
+  public getRandomFact(): Promise<string> {
+    return new Promise((resolve, reject) => {
+      https
+        .get('https://uselessfacts.jsph.pl/api/v2/facts/random', res => {
+          res.on('data', d => {
+            const data = JSON.parse(d)
+            const fact = data.text
+            resolve(fact)
+          })
+        })
+        .on('error', error => {
+          reject(error)
+        })
+    })
+  }
 }
 
 /**
  * The Invoker will execute any command every X seconds.
  */
 class CommandInvoker {
-    constructor(protected command: Command, protected seconds: number = 5) {
-    }
+  constructor(
+    protected command: Command,
+    protected seconds: number = 5,
+  ) {}
 
-    start(): void {
-        setInterval(() => {
-            this.command.execute();
-        },          this.seconds * 1000);
-    }
+  start(): void {
+    setInterval(() => {
+      this.command.execute()
+    }, this.seconds * 1000)
+  }
 }
 
 /**
  * The client code invokes the command
  */
-const randomFactDomainServiceReceiver = new RandomFactDomainServiceReceiver();
-const command = new PrintRandomFactCommand(randomFactDomainServiceReceiver);
-const commandInvoker = new CommandInvoker(command, 3);
+const randomFactDomainServiceReceiver = new RandomFactDomainServiceReceiver()
+const command = new PrintRandomFactCommand(randomFactDomainServiceReceiver)
+const commandInvoker = new CommandInvoker(command, 3)
 
-commandInvoker.start();
+commandInvoker.start()

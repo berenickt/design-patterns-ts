@@ -13,34 +13,34 @@
  * complexity of the subsystem.
  */
 class Facade {
-    protected subsystem1: Subsystem1;
+  protected subsystem1: Subsystem1
 
-    protected subsystem2: Subsystem2;
+  protected subsystem2: Subsystem2
 
-    /**
-     * Depending on your application's needs, you can provide the Facade with
-     * existing subsystem objects or force the Facade to create them on its own.
-     */
-    constructor(subsystem1?: Subsystem1, subsystem2?: Subsystem2) {
-        this.subsystem1 = subsystem1 || new Subsystem1();
-        this.subsystem2 = subsystem2 || new Subsystem2();
-    }
+  /**
+   * Depending on your application's needs, you can provide the Facade with
+   * existing subsystem objects or force the Facade to create them on its own.
+   */
+  constructor(subsystem1?: Subsystem1, subsystem2?: Subsystem2) {
+    this.subsystem1 = subsystem1 || new Subsystem1()
+    this.subsystem2 = subsystem2 || new Subsystem2()
+  }
 
-    /**
-     * The Facade's methods are convenient shortcuts to the sophisticated
-     * functionality of the subsystems. However, clients get only to a fraction
-     * of a subsystem's capabilities.
-     */
-    public operation(): string {
-        let result = 'Facade initializes subsystems:\n';
-        result += this.subsystem1.operation1();
-        result += this.subsystem2.operation1();
-        result += 'Facade orders subsystems to perform the action:\n';
-        result += this.subsystem1.operationN();
-        result += this.subsystem2.operationZ();
+  /**
+   * The Facade's methods are convenient shortcuts to the sophisticated
+   * functionality of the subsystems. However, clients get only to a fraction
+   * of a subsystem's capabilities.
+   */
+  public operation(): string {
+    let result = 'Facade initializes subsystems:\n'
+    result += this.subsystem1.operation1()
+    result += this.subsystem2.operation1()
+    result += 'Facade orders subsystems to perform the action:\n'
+    result += this.subsystem1.operationN()
+    result += this.subsystem2.operationZ()
 
-        return result;
-    }
+    return result
+  }
 }
 
 /**
@@ -49,30 +49,30 @@ class Facade {
  * a part of the Subsystem.
  */
 class Subsystem1 {
-    public operation1(): string {
-        return 'Subsystem1: Ready!\n';
-    }
+  public operation1(): string {
+    return 'Subsystem1: Ready!\n'
+  }
 
-    // ...
+  // ...
 
-    public operationN(): string {
-        return 'Subsystem1: Go!\n';
-    }
+  public operationN(): string {
+    return 'Subsystem1: Go!\n'
+  }
 }
 
 /**
  * Some facades can work with multiple subsystems at the same time.
  */
 class Subsystem2 {
-    public operation1(): string {
-        return 'Subsystem2: Get ready!\n';
-    }
+  public operation1(): string {
+    return 'Subsystem2: Get ready!\n'
+  }
 
-    // ...
+  // ...
 
-    public operationZ(): string {
-        return 'Subsystem2: Fire!';
-    }
+  public operationZ(): string {
+    return 'Subsystem2: Fire!'
+  }
 }
 
 /**
@@ -82,11 +82,11 @@ class Subsystem2 {
  * approach lets you keep the complexity under control.
  */
 function clientCode(facade: Facade) {
-    // ...
+  // ...
 
-    console.log(facade.operation());
+  console.log(facade.operation())
 
-    // ...
+  // ...
 }
 
 /**
@@ -94,7 +94,7 @@ function clientCode(facade: Facade) {
  * this case, it might be worthwhile to initialize the Facade with these objects
  * instead of letting the Facade create new instances.
  */
-const subsystem1 = new Subsystem1();
-const subsystem2 = new Subsystem2();
-const facade = new Facade(subsystem1, subsystem2);
-clientCode(facade);
+const subsystem1 = new Subsystem1()
+const subsystem2 = new Subsystem2()
+const facade = new Facade(subsystem1, subsystem2)
+clientCode(facade)
