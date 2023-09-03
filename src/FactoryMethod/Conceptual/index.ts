@@ -1,101 +1,91 @@
-/**
- * Factory Method Design Pattern
- *
- * Intent: Provides an interface for creating objects in a superclass, but
- * allows subclasses to alter the type of objects that will be created.
- */
+// 📌 1. Product 인터페이스를 정의합니다.
+interface Pizza {
+  prepare(): string
+  bake(): string
+  cut(): string
+  box(): string
+}
 
-/**
- * The Creator class declares the factory method that is supposed to return an
- * object of a Product class. The Creator's subclasses usually provide the
- * implementation of this method.
- */
-abstract class Creator {
-  /**
-   * Note that the Creator may also provide some default implementation of the
-   * factory method.
-   */
-  public abstract factoryMethod(): Product
-
-  /**
-   * Also note that, despite its name, the Creator's primary responsibility is
-   * not creating products. Usually, it contains some core business logic that
-   * relies on Product objects, returned by the factory method. Subclasses can
-   * indirectly change that business logic by overriding the factory method
-   * and returning a different type of product from it.
-   */
-  public someOperation(): string {
-    // Call the factory method to create a Product object.
-    const product = this.factoryMethod()
-    // Now, use the product.
-    return `Creator: The same creator's code has just worked with ${product.operation()}`
+// 📌 2. 여러 종류의 피자를 구현하는 ConcretePizza 클래스들을 생성합니다.
+class CheesePizza implements Pizza {
+  prepare(): string {
+    return '치즈 피자를 준비합니다.'
+  }
+  bake(): string {
+    return '치즈 피자를 굽습니다.'
+  }
+  cut(): string {
+    return '치즈 피자를 자릅니다.'
+  }
+  box(): string {
+    return '치즈 피자를 포장합니다.'
   }
 }
 
-/**
- * Concrete Creators override the factory method in order to change the
- * resulting product's type.
- */
-class ConcreteCreator1 extends Creator {
-  /**
-   * Note that the signature of the method still uses the abstract product
-   * type, even though the concrete product is actually returned from the
-   * method. This way the Creator can stay independent of concrete product
-   * classes.
-   */
-  public factoryMethod(): Product {
-    return new ConcreteProduct1()
+class PepperoniPizza implements Pizza {
+  prepare(): string {
+    return '페퍼로니 피자를 준비합니다.'
+  }
+  bake(): string {
+    return '페퍼로니 피자를 굽습니다.'
+  }
+  cut(): string {
+    return '페퍼로니 피자를 자릅니다.'
+  }
+  box(): string {
+    return '페퍼로니 피자를 포장합니다.'
   }
 }
 
-class ConcreteCreator2 extends Creator {
-  public factoryMethod(): Product {
-    return new ConcreteProduct2()
+// 📌 3. PizzaFactory 추상 클래스를 생성하고 팩토리 메서드를 선언합니다.
+abstract class PizzaFactory {
+  // 팩토리 메서드를 선언합니다. 하위 클래스에서 이를 구체화해야 합니다.
+  public abstract createPizza(): Pizza
+
+  // 피자를 주문하고 제작, 구움, 자름, 포장 과정을 수행하는 메서드를 제공합니다.
+  public orderPizza(): string {
+    // 팩토리 메서드를 사용하여 피자를 생성합니다.
+    const pizza = this.createPizza()
+
+    // 피자 제작 과정을 수행하고 결과를 반환합니다.
+    return `
+      주문한 피자: ${pizza.prepare()},
+      ${pizza.bake()},
+      ${pizza.cut()},
+      ${pizza.box()}
+    `
   }
 }
 
-/**
- * The Product interface declares the operations that all concrete products must
- * implement.
- */
-interface Product {
-  operation(): string
-}
-
-/**
- * Concrete Products provide various implementations of the Product interface.
- */
-class ConcreteProduct1 implements Product {
-  public operation(): string {
-    return '{Result of the ConcreteProduct1}'
+// 📌 4. CheesePizzaFactory와 PepperoniPizzaFactory 클래스를 생성하고 PizzaFactory를 상속합니다.
+// 치즈 피자를 생성하는 팩토리
+class CheesePizzaFactory extends PizzaFactory {
+  // 치즈 피자를 생성하는 구체적인 팩토리 메서드를 구현합니다.
+  public createPizza(): Pizza {
+    return new CheesePizza()
   }
 }
 
-class ConcreteProduct2 implements Product {
-  public operation(): string {
-    return '{Result of the ConcreteProduct2}'
+// 페퍼로니 피자를 생성하는 팩토리
+class PepperoniPizzaFactory extends PizzaFactory {
+  // 페퍼로니 피자를 생성하는 구체적인 팩토리 메서드를 구현합니다.
+  public createPizza(): Pizza {
+    return new PepperoniPizza()
   }
 }
 
-/**
- * The client code works with an instance of a concrete creator, albeit through
- * its base interface. As long as the client keeps working with the creator via
- * the base interface, you can pass it any creator's subclass.
- */
-function clientCode(creator: Creator) {
-  // ...
-  console.log("Client: I'm not aware of the creator's class, but it still works.")
-  console.log(creator.someOperation())
-  // ...
+// 📌 5. 클라이언트 코드를 위한 함수를 정의합니다.
+function clientCode(factory: PizzaFactory) {
+  // 클라이언트 코드에서 PizzaFactory를 사용하여 피자를 주문하고 제작 과정을 출력합니다.
+  console.log('클라이언트: 피자를 주문하고 제작 과정을 확인합니다.')
+  console.log(factory.orderPizza())
 }
 
-/**
- * The Application picks a creator's type depending on the configuration or
- * environment.
- */
-console.log('App: Launched with the ConcreteCreator1.')
-clientCode(new ConcreteCreator1())
+// 📌 6. 애플리케이션 시작: 치즈 피자를 생성하는 공장을 사용하여 클라이언트 코드를 실행합니다.
+console.log('앱: 치즈 피자 주문을 시작합니다.')
+clientCode(new CheesePizzaFactory())
 console.log('')
 
-console.log('App: Launched with the ConcreteCreator2.')
-clientCode(new ConcreteCreator2())
+// 📌 7. 애플리케이션 시작: 페퍼로니 피자를 생성하는 공장을 사용하여 클라이언트 코드를 실행합니다.
+console.log('앱: 페퍼로니 피자 주문을 시작합니다.')
+clientCode(new PepperoniPizzaFactory())

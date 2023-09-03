@@ -1,15 +1,15 @@
 /**
- * Real World Example for the Factory Method design pattern
+ * Factory Method 패턴을 실제 사용 예
  *
- * Need: Create different database connectors and be able to switch the
- * connector with an environment variable
+ * Need:
+ * 다양한 데이터베이스 커넥터를 생성하고 환경 변수를 사용하여 커넥터를 전환
  *
- * Solution: Create an abstract class with a factory method that returns a
- * concrete implementation of a database connection
+ * Solution:
+ * 데이터베이스 연결의 구체적인 구현을 반환하는 팩토리 메소드로 추상 클래스 생성
  */
 
 /**
- * Abstract class with the factory method
+ * factory method를 가진 추상 클래스(Abstract class)
  */
 export abstract class DBConnectionFactory {
   public abstract createDBConnection(): DBConnection
@@ -31,7 +31,7 @@ export class RedisConnectionFactory extends DBConnectionFactory {
 }
 
 /**
- * Abstract product to be created = database connection
+ * 생성될 Abstract product = 데이터베이스 연결
  */
 export abstract class DBConnection {
   provider: string
@@ -42,7 +42,7 @@ export abstract class DBConnection {
 }
 
 /**
- * Concrete product to be created = database connection
+ * 생성한 Concrete product = 데이터베이스 연결
  */
 export class MongoConnection extends DBConnection {
   provider: string
@@ -63,7 +63,7 @@ export class RedisConnection extends DBConnection {
 }
 
 /**
- * The client function accepts any concrete factory
+ * client함수는 어떤 concrete factory를 수용합니다.
  */
 function main(dbConnectionFactory: DBConnectionFactory) {
   const dbConnection = dbConnectionFactory.createDBConnection()
@@ -71,8 +71,7 @@ function main(dbConnectionFactory: DBConnectionFactory) {
 }
 
 /**
- * Based on an environment variable, we create a concrete factory and inject it
- * to the client function
+ * 환경 변수에 따라 concrete factory를 생성하고, client 함수에 주입함
  */
 switch (process.env.DB) {
   case 'Mongo':
