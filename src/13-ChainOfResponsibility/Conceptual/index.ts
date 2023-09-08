@@ -1,110 +1,123 @@
-/**
- * Chain of Responsibility Design Pattern
- *
- * Intent: Lets you pass requests along a chain of handlers. Upon receiving a
- * request, each handler decides either to process the request or to pass it to
- * the next handler in the chain.
+/** Chain of Responsibility Design Pattern
+ * Intent:
+ * 요청을 처리할 수 있는 객체들을 연결하여 처리 책임을 위임하고,
+ * 요청을 처리할 객체를 찾을 때까지 객체의 체인을 따라 이동합니다.
  */
 
 /**
- * The Handler interface declares a method for building the chain of handlers.
- * It also declares a method for executing a request.
+ * 📌 1. 로그 레벨 열거형
  */
-interface Handler {
-  setNext(handler: Handler): Handler
-
-  handle(request: string): string
+enum LogLevel {
+  INFO,
+  DEBUG,
+  WARNING,
+  ERROR,
 }
 
 /**
- * The default chaining behavior can be implemented inside a base handler class.
+ * 📌 2. 로그 메시지 클래스
  */
-abstract class AbstractHandler implements Handler {
-  private nextHandler: Handler
+class LogMessage {
+  constructor(public message: string, public level: LogLevel) {}
+}
 
-  public setNext(handler: Handler): Handler {
+/**
+ * 📌 3. 로그 핸들러 인터페이스
+ */
+interface LogHandler {
+  setNext(handler: LogHandler): LogHandler
+  handle(message: LogMessage): void
+}
+
+/**
+ * 📌 4. 추상 로그 핸들러 클래스
+ */
+abstract class AbstractLogHandler implements LogHandler {
+  private nextHandler: LogHandler | null = null
+
+  public setNext(handler: LogHandler): LogHandler {
     this.nextHandler = handler
-    // Returning a handler from here will let us link handlers in a
-    // convenient way like this:
-    // monkey.setNext(squirrel).setNext(dog);
     return handler
   }
 
-  public handle(request: string): string {
-    if (this.nextHandler) {
-      return this.nextHandler.handle(request)
+  public handle(message: LogMessage): void {
+    if (this.nextHandler !== null) {
+      this.nextHandler.handle(message)
     }
-
-    return null
   }
 }
 
 /**
- * All Concrete Handlers either handle a request or pass it to the next handler
- * in the chain.
+ * 📌 5. 정보 로그 핸들러 클래스
  */
-class MonkeyHandler extends AbstractHandler {
-  public handle(request: string): string {
-    if (request === 'Banana') {
-      return `Monkey: I'll eat the ${request}.`
-    }
-    return super.handle(request)
-  }
-}
-
-class SquirrelHandler extends AbstractHandler {
-  public handle(request: string): string {
-    if (request === 'Nut') {
-      return `Squirrel: I'll eat the ${request}.`
-    }
-    return super.handle(request)
-  }
-}
-
-class DogHandler extends AbstractHandler {
-  public handle(request: string): string {
-    if (request === 'MeatBall') {
-      return `Dog: I'll eat the ${request}.`
-    }
-    return super.handle(request)
-  }
-}
-
-/**
- * The client code is usually suited to work with a single handler. In most
- * cases, it is not even aware that the handler is part of a chain.
- */
-function clientCode(handler: Handler) {
-  const foods = ['Nut', 'Banana', 'Cup of coffee']
-
-  for (const food of foods) {
-    console.log(`Client: Who wants a ${food}?`)
-
-    const result = handler.handle(food)
-    if (result) {
-      console.log(`  ${result}`)
+class InfoLogHandler extends AbstractLogHandler {
+  public handle(message: LogMessage): void {
+    if (message.level === LogLevel.INFO) {
+      console.log(`INFO 로그: ${message.message}`)
     } else {
-      console.log(`  ${food} was left untouched.`)
+      super.handle(message)
     }
   }
 }
 
 /**
- * The other part of the client code constructs the actual chain.
+ * 📌 6. 디버그 로그 핸들러 클래스
  */
-const monkey = new MonkeyHandler()
-const squirrel = new SquirrelHandler()
-const dog = new DogHandler()
-
-monkey.setNext(squirrel).setNext(dog)
+class DebugLogHandler extends AbstractLogHandler {
+  public handle(message: LogMessage): void {
+    if (message.level === LogLevel.DEBUG) {
+      console.log(`DEBUG 로그: ${message.message}`)
+    } else {
+      super.handle(message)
+    }
+  }
+}
 
 /**
- * The client should be able to send a request to any handler, not just the
- * first one in the chain.
+ * 📌 7. 경고 로그 핸들러 클래스
  */
-console.log('Chain: Monkey > Squirrel > Dog\n')
-clientCode(monkey)
-console.log('')
+class WarningLogHandler extends AbstractLogHandler {
+  public handle(message: LogMessage): void {
+    if (message.level === LogLevel.WARNING) {
+      console.log(`경고 로그: ${message.message}`)
+    } else {
+      super.handle(message)
+    }
+  }
+}
 
-console.log('Subchain: Squirrel > Dog\n')
-clientCode(squirrel)
+/**
+ * 📌 8. 에러 로그 핸들러 클래스
+ */
+class ErrorLogHandler extends AbstractLogHandler {
+  public handle(message: LogMessage): void {
+    if (message.level === LogLevel.ERROR) {
+      console.error(`에러 로그: ${message.message}`)
+    } else {
+      super.handle(message)
+    }
+  }
+}
+
+/**
+ * 📌 9. 클라이언트 코드
+ */
+const infoHandler: LogHandler = new InfoLogHandler()
+const debugHandler: LogHandler = new DebugLogHandler()
+const warningHandler: LogHandler = new WarningLogHandler()
+const errorHandler: LogHandler = new ErrorLogHandler()
+
+infoHandler.setNext(debugHandler).setNext(warningHandler).setNext(errorHandler)
+
+// 로그 레벨에 따라 로그 처리
+const message1: LogMessage = new LogMessage('안녕하세요.', LogLevel.INFO)
+infoHandler.handle(message1)
+
+const message2: LogMessage = new LogMessage('디버그 메시지입니다.', LogLevel.DEBUG)
+infoHandler.handle(message2)
+
+const message3: LogMessage = new LogMessage('경고: 서비스에 문제가 있습니다.', LogLevel.WARNING)
+infoHandler.handle(message3)
+
+const message4: LogMessage = new LogMessage('에러 발생: 서버 다운.', LogLevel.ERROR)
+infoHandler.handle(message4)
