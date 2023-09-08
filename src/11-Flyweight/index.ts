@@ -1,10 +1,9 @@
-/**
- * Flyweight Design Pattern
- * Intent: 여러 객체에서 중복되는 데이터를 공유하여 메모리 사용을 최적화하는 패턴입니다.
+/** Flyweight Design Pattern
+ * Intent(의미): 여러 객체에서 중복되는 데이터를 공유하여 메모리 사용을 최적화하는 패턴입니다.
  */
 
 /**
- * 관광 정보를 저장하는 경량 객체 (플라이웨이트)
+ * 📌 1. 관광 정보를 저장하는 경량 객체 (플라이웨이트)
  */
 class TouristInfo {
   private name: string
@@ -31,7 +30,7 @@ class TouristInfo {
 }
 
 /**
- * 경량 객체를 생성하고 관리하는 팩토리
+ * 📌 2. 경량 객체를 생성하고 관리하는 팩토리
  */
 class TouristInfoFactory {
   private touristInfos: { [key: string]: TouristInfo } = {}
@@ -71,7 +70,7 @@ class TouristInfoFactory {
 }
 
 /**
- * 클라이언트 코드
+ * 📌 3. 클라이언트 코드
  */
 const touristInfoFactory = new TouristInfoFactory()
 
