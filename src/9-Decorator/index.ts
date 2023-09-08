@@ -1,10 +1,10 @@
-// 피자 인터페이스
+// 📌 1. 피자 인터페이스
 interface Pizza {
   getDescription(): string
   getCost(): number
 }
 
-// 기본 피자 구현
+// 📌 2. 기본 피자 구현
 class PlainPizza implements Pizza {
   getDescription(): string {
     return '기본 피자'
@@ -15,7 +15,7 @@ class PlainPizza implements Pizza {
   }
 }
 
-// 피자 데코레이터 추상 클래스
+// 📌 3. 피자 데코레이터 추상 클래스
 abstract class PizzaDecorator implements Pizza {
   protected pizza: Pizza
 
@@ -27,7 +27,7 @@ abstract class PizzaDecorator implements Pizza {
   abstract getCost(): number
 }
 
-// 토핑 데코레이터 - 치즈 추가
+// 📌 4. 토핑 데코레이터 - 치즈 추가
 class CheeseTopping extends PizzaDecorator {
   constructor(pizza: Pizza) {
     super(pizza)
@@ -57,7 +57,7 @@ class PepperoniTopping extends PizzaDecorator {
   }
 }
 
-// 주문
+// 📌 5. 주문
 const basicPizza: Pizza = new PlainPizza()
 console.log('기본 피자:', basicPizza.getDescription(), '가격:', basicPizza.getCost())
 

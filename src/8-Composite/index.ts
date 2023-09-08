@@ -1,11 +1,11 @@
-// 1. Component 인터페이스 (조직 구성원)
+// 📌 1. Component 인터페이스 (조직 구성원)
 interface Employee {
   getName(): string
   getRole(): string
   getSalary(): number
 }
 
-// 2. Leaf 클래스 (개별 직원)
+// 📌 2. Leaf 클래스 (개별 직원)
 class LeafEmployee implements Employee {
   private name: string
   private role: string
@@ -30,7 +30,7 @@ class LeafEmployee implements Employee {
   }
 }
 
-// 3. Composite 클래스 (부서, 팀)
+// 📌 3. Composite 클래스 (부서, 팀)
 class CompositeEmployee implements Employee {
   private name: string
   private role: string
@@ -64,7 +64,7 @@ class CompositeEmployee implements Employee {
   }
 }
 
-// 4. 클라이언트 코드
+// 📌 4. 클라이언트 코드
 function main() {
   // 개별 직원 생성
   const individualEmployee1 = new LeafEmployee('Alice', '엔지니어', 60000)
